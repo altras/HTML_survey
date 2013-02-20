@@ -115,7 +115,79 @@ div.ss-submit div.ss-form-entry{
 .button.approve.icon:hover:before,
 .button.approve.icon:focus:before,
 .button.approve.icon:active:before { background-position: -12px -48px; }
+
+label.error {
+display: list-item;
+color: #ff0600;
+font-size: 12px;
+list-style-position: inside;
+padding: 5px 0 0;}
 </style>
+
+<script src="jquery.validate.min.js"></script>
+<script>
+$(function() {
+    var validateCustomRadioGroup = function(name) {
+        var checkSelected = false;
+        $("input[name$='"+name+"']").each(function(i, radio){
+            if($(radio).is(':checked'))
+                checkSelected = true
+        });
+        if(!checkSelected) {
+            $("input[name$='"+name+".other_option_']").after("<label class='error'>required</label>");
+            return false;
+        } else {
+            if($("input[name$='"+name+"']:last").is(":checked") && $("input[name$='"+name+".other_option_']").val().length == 0) {
+                $("input[name$='"+name+".other_option_']").after("<label class='error'>required</label>");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    var validateSingleEntry = function(name) {
+        var val = $("input[name$='"+name+"']").val();
+        if(!val || val.length == 0) {
+            $("input[name$='"+name+"']").after("<label class='error'>required</label>");
+            return false;
+        }
+        return true;
+    }
+
+    var validateTextareaEntry = function(name) {
+        var val = $("textarea[name$='"+name+"']").val();
+        if(!val || val.length == 0) {
+            $("textarea[name$='"+name+"']").after("<label class='error'>required</label>");
+            return false;
+        }
+        return true;
+    }
+
+    $("#ss-form").submit(function(e){
+        
+        $("label.error").remove();
+        var targetGroups = ["entry.0.group", "entry.2.group", "entry.3.group", 
+            "entry.5.group", "entry.7.group", "entry.8.group"];
+        var targetSingleLines = ["entry.1.single", "entry.4.single"]
+        var valid = true;
+        for (var i = targetGroups.length - 1; i >= 0; i--) {
+            if(!validateCustomRadioGroup(targetGroups[i]))
+                valid = false;
+        };
+        for (var i = targetSingleLines.length - 1; i >= 0; i--) {
+            if(!validateSingleEntry(targetSingleLines[i]))
+                valid = false;
+        };
+        if(!validateTextareaEntry("entry.6.single"))
+            valid = false;
+        if(!valid){
+            e.preventDefault();
+            return false;
+        }
+    });
+});
+</script>
+
 </head>
 
 <body class="ss-base-body" dir="ltr" itemscope="" itemtype="http://schema.org/CreativeWork/FormObject">
@@ -131,11 +203,7 @@ div.ss-submit div.ss-form-entry{
 </div>
 </div>
 <div class="ss-form">
-<script type="text/javascript">var submitted=false;</script>
-<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {window.location='thanks.html';}">
-					</iframe>
-<form action="https://docs.google.com/spreadsheet/formResponse?formkey=dG1aaGkteG5JQXIxNG5KSy03UFhqSkE6MQ&amp;theme=0AX42CRMsmRFbUy1mZjU1N2I3Ni1lMjE0LTRmNDQtOTM5Ny0yMDRjNDVjZGFkYjI&amp;ifq" method="POST" id="ss-form" target="hidden_iframe"
-onsubmit="submitted=true;">
+<form action="https://docs.google.com/spreadsheet/formResponse?formkey=dG1aaGkteG5JQXIxNG5KSy03UFhqSkE6MQ&amp;theme=0AX42CRMsmRFbUy1mZjU1N2I3Ni1lMjE0LTRmNDQtOTM5Ny0yMDRjNDVjZGFkYjI&amp;ifq" method="POST" id="ss-form" target="hidden_iframe" onsubmit="submitted=true;">
 
 
 <br>
@@ -215,6 +283,10 @@ No</label></li>
 <label for="other_option:8">Other:</label>
 <input type="text" name="entry.8.group.other_option_" value="" class="ss-q-other"></li></ul></div></div></div>
 <br>
+<div class="ss-form-entry"><label class="ss-q-title" for="entry_9">Subscribe to know when are we launching Edukami 
+</label>
+<label class="ss-q-help" for="entry_9">Our newsletter is made with love :)</label>
+<input type="text" name="entry.9.single" value="" class="ss-q-short" id="entry_9"></div>
 <input type="hidden" name="pageNumber" value="0">
 <input type="hidden" name="backupCache" value="">
 
@@ -266,7 +338,8 @@ for (var i = 0; i < numDivs; i++) {
 </div>
 </div>
 
-
+<script>var submitted=false;</script>
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) {window.location='thanks.html';}"></iframe>
 </body>
 
 </html>
